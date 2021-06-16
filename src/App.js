@@ -34,12 +34,38 @@ const App = () => {
         '3' : {id : '3', text : 'TEST3', completed : false},
     });
     const _addTask = () => {
-        alert(`Add ${newTask}`);
+        //alert(`Add ${newTask}`);
+        const ID = Date.now().toString();
+        const newTaskObject = {
+            [ID] : {id : ID, text:newTask, completed:false},
+        };
+        setTasks({...tasks, ...newTaskObject});
         setNewTask('');
     }
 
     const _handleTextChange = Text => {
         setNewTask(Text);
+    }
+
+    const _deleteTask = id => {
+        const currentTasks = Object.assign({}, tasks);
+        delete currentTasks[id];
+        setTasks(currentTasks);
+    }
+
+    const _toggleTask = id => {
+        const currentTasks = Object.assign({}, tasks);
+        currentTasks[id]['completed'] = !currentTasks[id]['completed'];//toggling
+        setTasks(currentTasks);
+    }
+
+    const _onBlur = () => {
+        setNewTask('');
+    }
+    const _updateTask = item => {
+        const currentTasks = Object.assign({}, tasks);
+        currentTasks[item.id] = item;
+        setTasks(currentTasks);
     }
     const width = useWindowDimensions().width;
 
@@ -55,11 +81,19 @@ const App = () => {
                     placeholder="new task"
                     value={newTask}
                     onChangeText={_handleTextChange}
-                    onSubmitEditing={_addTask}/>
+                    onSubmitEditing={_addTask}
+                    onBlur={_onBlur}
+                    />
                     <List width = {width}>
                         {Object.values(tasks)
                         .reverse()
-                        .map(item => <Task key={item.id} text={item.text}/>)
+                        .map(item => <Task 
+                                        key={item.id} 
+                                        item={item} 
+                                        deleteTask={_deleteTask}
+                                        toggleTask={_toggleTask}
+                                        updateTask={_updateTask}
+                                        />)
                         }
                     </List>
             </Container>
